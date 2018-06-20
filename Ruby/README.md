@@ -1,17 +1,23 @@
 
 Technologies used
 -----------------------------------------------------------------------------------------
-Ruby 2.5, Sinatra
+Ruby 2.5, MongoDB 3.6, Sinatra
 
 Technologies used
 -----------------------------------------------------------------------------------------
 Set the path to Windows if not configured.
 
+SETX PATH "%PATH%;C:\MongoDB\Server\3.6\bin"
 SETX PATH "%PATH%;C:\Ruby25-x64\bin"
 
 Needed to install.
 
-gem install sinatra
+1. gem install mongo
+2. gem install sinatra
+
+Database to be executed.
+
+mongod --port 27017
 
 Script to be executed.
 

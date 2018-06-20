@@ -1,4 +1,6 @@
 
+require './mongodb.rb'
+
 require 'json'
 require 'open-uri'
 require 'sinatra'
@@ -9,6 +11,7 @@ require 'sinatra'
 # Return: information a informacao
 def get_information(id)
   information = {
+    'id' => '',
     'name' => '',
     'badges' => 0,
     'trails' => 0,
@@ -19,6 +22,9 @@ def get_information(id)
     source = open('https://trailhead.salesforce.com/pt-BR/me/' + id) { |file|
       # Obter a linha.
       line = file.read
+
+      # Definir o id.
+      information['id'] = id
 
       # Obter o nome.
       information['name'] = line.scan(/<h1 [^>]*data-test-user-name[^>]*>([^<>]*)<\/h1>/imu).flatten.select { |item|
