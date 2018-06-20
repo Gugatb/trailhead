@@ -49,6 +49,10 @@ def get_information(id)
   rescue Exception => message
     puts message
   end
+
+  mm = MongoDB.new
+  puts 'Teste'
+  puts mm.insert('cache', information)
   return information
 end
 

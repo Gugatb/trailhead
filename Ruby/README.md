@@ -7,13 +7,14 @@ Technologies used
 -----------------------------------------------------------------------------------------
 Set the path to Windows if not configured.
 
-SETX PATH "%PATH%;C:\MongoDB\Server\3.6\bin"
+SETX PATH "%PATH%;C:\MongoDB\Server\3.6\bin"  
 SETX PATH "%PATH%;C:\Ruby25-x64\bin"
 
 Needed to install.
 
 1. gem install mongo
-2. gem install sinatra
+2. gem install neatjson
+3. gem install sinatra
 
 Database to be executed.
 
