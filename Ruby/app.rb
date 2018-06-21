@@ -6,7 +6,7 @@ require 'open-uri'
 require 'sinatra'
 
 # Tempo de vida da cache (5 minutos).
-$time_life = 5 * 60
+$time_life = 20 #5 * 60
 
 # Obter a informacao.
 # Author: Gugatb
