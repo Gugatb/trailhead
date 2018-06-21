@@ -25,7 +25,7 @@ class MongoDB
       client = Mongo::Client.new(@@client_host, @@client_options)
 
       # Deletar o documento.
-      result = client[collection_name].find(id: id).delete_many
+      result = client[collection_name].find(profile_id: id).delete_many
       result.each { |document| counter = counter + 1 }
 
       # Fechar a conexao com o banco.
@@ -76,12 +76,51 @@ class MongoDB
       client = Mongo::Client.new(@@client_host, @@client_options)
 
       # Procurar o documento.
-      result = client[collection_name].find(id: id)
+      result = client[collection_name].find(profile_id: id)
 
       # Iterar o resultado.
       result.each { |document|
         json << JSON.neat_generate(document)
       }
+
+      # Fechar a conexao com o banco.
+      client.close
+    rescue StandardError => message
+      puts message
+    end
+    return json
+  end
+
+  # Ler o documento da cache.
+  # Author: Gugatb
+  # Date: 20/06/2018
+  # Param: collection_name o nome da colecao
+  # Param: id o id
+  # Param: time_life o tempo de vida
+  # Return: json o json
+  def readCache(collection_name, id, time_life)
+    json = []
+
+    begin
+      # Conectar com o banco.
+      client = Mongo::Client.new(@@client_host, @@client_options)
+
+      # Procurar o documento.
+      result = client[collection_name].find(profile_id: id)
+
+      if result != nil
+        first = JSON.neat_generate(result.first)
+        time1 = Time.parse(Time.now.to_s)
+        time2 = Time.parse(JSON.parse(first)['time'])
+
+        # Verificar se o tempo de vida terminou.
+        if time1 - time2 < time_life
+          json << first
+        else
+          # Se o tempo de vida terminou, apagar o documento.
+          result.delete_many
+        end
+      end
 
       # Fechar a conexao com o banco.
       client.close
@@ -107,7 +146,7 @@ class MongoDB
       client = Mongo::Client.new(@@client_host, @@client_options)
 
       # Update the document that matches our query below
-      result = client[collection_name].find(id: id).update_many('$set' => {field => value})
+      result = client[collection_name].find(profile_id: id).update_many('$set' => {field => value})
       result.each { |document| counter = counter + 1 }
 
       # Fechar a conexao com o banco.
