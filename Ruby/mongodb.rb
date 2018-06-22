@@ -75,7 +75,7 @@ class MongoDB
   # Param: id o id do documento
   # Return: json o json
   def read(collection_name, id)
-    json = []
+    json = nil
 
     begin
       # Conectar com o banco.
@@ -83,11 +83,7 @@ class MongoDB
 
       # Procurar o documento.
       result = @@client[collection_name].find(profile_id: id)
-
-      # Iterar o resultado.
-      result.each { |document|
-        json << JSON.neat_generate(document)
-      }
+      json = JSON.neat_generate(result.first)
 
       # Fechar a conexao com o banco.
       # client.close
@@ -105,7 +101,7 @@ class MongoDB
   # Param: time_life o tempo de vida
   # Return: json o json
   def readCache(collection_name, id, time_life)
-    json = []
+    json = nil
 
     begin
       # Conectar com o banco.
@@ -121,7 +117,7 @@ class MongoDB
 
         # Verificar se o tempo de vida terminou.
         if time1 - time2 < time_life
-          json << first
+          json = first
         else
           # Se o tempo de vida terminou, apagar o documento.
           result.delete_many

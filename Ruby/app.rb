@@ -29,7 +29,7 @@ def get_information(profile_id)
     # Ler a cache.
     json = db.readCache('cache', profile_id, $time_life)
 
-    if json.size == 0
+    if json == nil
       source = open('https://trailhead.salesforce.com/pt-BR/me/' + profile_id) { |file|
         # Obter a linha.
         line = file.read
@@ -62,7 +62,7 @@ def get_information(profile_id)
       db.insert('cache', information)
     else
         # Utilizar o documento da cache.
-      json = JSON.parse(json.first)
+      json = JSON.parse(json)
 
       information = {
         'profile_id' => json['profile_id'],

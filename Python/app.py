@@ -17,11 +17,15 @@ class print_hello(Resource):
     def get(self):
         # Inserir o documento.
         # result = db.insert('test', {'Teste': 'key'})
-        
+        # result = db.insert('test', {'Teste': 'key'})
+        # result = db.insert('test', {'Teste': 'key'})
+
         result = db.read('test', 'key')
 
         # result = {'data': ['ola', 'mundo']}
         return jsonify(result)
+        # return result
+        # return jsonify({'Result': str(db.delete('test', 'key'))})
 
 class print_params(Resource):
     '''

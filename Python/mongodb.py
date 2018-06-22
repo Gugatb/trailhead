@@ -22,7 +22,13 @@ class MongoDB:
         """
         counter = 0
 
-        # result = client[collection_name].find(profile_id: id).delete_many
+        try:
+            # Deletar o documento.
+            result = client_db[collection_name].delete_many({'Teste': id})
+            counter = int(result.deleted_count)
+        except Exception as message:
+            print(str(message))
+        return counter
 
 
     def insert(self, collection_name, document):
@@ -55,12 +61,11 @@ class MongoDB:
         Param: id o id do documento
         Return: counter o contador de documentos inseridos
         """
-        json = []
+        json = None
 
         try :
-            # Procurar o documento.
-            for document in client_db[collection_name].find({'profile_id': id}):
-                json.append(str(document))
+            for document in client_db[collection_name].find({'Teste': id}):
+                return str(document))
         except Exception as message:
             print(str(message))
         return json
