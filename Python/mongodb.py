@@ -1,6 +1,7 @@
 
 import json
 
+from datetime import datetime
 from pymongo import MongoClient
 
 # Cliente com o MongoDB.
@@ -61,11 +62,56 @@ class MongoDB:
         Param: id o id do documento
         Return: counter o contador de documentos inseridos
         """
-        json = None
-
-        try :
+        try:
             for document in client_db[collection_name].find({'Teste': id}):
-                return str(document))
+                return str(document)
         except Exception as message:
             print(str(message))
-        return json
+        return None
+
+    def readCache(self, collection_name, id, time_life):
+        """
+        Ler o documento da cache.
+        Author: Gugatb
+        Date: 28/06/2018
+        Param: collection_name  o nome da colecao
+        Param: id o id do documento
+        Param: time_life o tempo de vida
+        Return: json o json
+        """
+        try:
+            for document in client_db[collection_name].find({'Teste': id}):
+                time1 = datetime.strptime(document['time'], "%Y-%m-%d %H:%M:%S")
+                time2 = datetime.now()
+
+                # Verificar se o tempo de vida terminou.
+                if (time2 - time1).total_seconds() < time_life:
+                    return str(document)
+                else:
+                    # Se o tempo de vida terminou, apagar o documento.
+                    client_db[collection_name].delete_many({'Teste': id})
+                    break
+        except Exception as message:
+            print(str(message))
+        return None
+
+    def update(self, collection_name, id, field, value):
+        """
+        Atualizar o documento.
+        Author: Gugatb
+        Date: 28/06/2018
+        Param: collection_name  o nome da colecao
+        Param: id o id do documento
+        Param: field o campo
+        Param: value o valor
+        Return: counter o contador de documentos atualizados
+        """
+        counter = 0
+
+        try:
+            # Atualizar o documento.
+            result = client_db[collection_name].update_many({'Teste': id}, {'$set': {field: value}})
+            counter = int(result.modified_count)
+        except Exception as message:
+            print(str(message))
+        return counter
