@@ -6,7 +6,7 @@ require 'open-uri'
 require 'sinatra'
 
 # Tempo de vida da cache (5 minutos).
-$time_life = 20 #5 * 60
+$time_life = 5 * 60
 
 # Obter a informacao.
 # Author: Gugatb
@@ -20,7 +20,7 @@ def get_information(profile_id)
     'badges' => 0,
     'trails' => 0,
     'points' => 0,
-    'time' => Time.now.to_s
+    'time' => Time.now.strftime("%Y-%m-%d %H:%M:%S")
   }
 
   begin
@@ -30,7 +30,7 @@ def get_information(profile_id)
     json = db.readCache('cache', profile_id, $time_life)
 
     if json == nil
-      source = open('https://trailhead.salesforce.com/pt-BR/me/' + profile_id) { |file|
+      html = open('https://trailhead.salesforce.com/pt-BR/me/' + profile_id) { |file|
         # Obter a linha.
         line = file.read
 
@@ -43,17 +43,17 @@ def get_information(profile_id)
         }.first
 
         # Obter os emblemas.
-        information['badges'] = line.scan(/<div [^>]*class=\'user-information__achievements-data\' data-test-badges-count[^>]*>([^<>]*)<\/div>/imu).flatten.select { |item|
+        information['badges'] = line.scan(/<div [^>]*data-test-badges-count[^>]*>([^<>]*)<\/div>/imu).flatten.select { |item|
           !item.empty?
         }.first.to_i
 
         # Obter os trilhas.
-        information['trails'] = line.scan(/<div [^>]*class=\'user-information__achievements-data\' data-test-trails-count[^>]*>\n([^<>]*)\n<\/div>/imu).flatten.select { |item|
+        information['trails'] = line.scan(/<div [^>]*data-test-trails-count[^>]*>\n([^<>]*)\n<\/div>/imu).flatten.select { |item|
           !item.empty?
         }.first.to_i
 
         # Obter os pontos.
-        information['points'] = line.scan(/<div [^>]*class=\'user-information__achievements-data\' data-test-points-count[^>]*>\n([^<>]*)\n<\/div>/imu).flatten.select { |item|
+        information['points'] = line.scan(/<div [^>]*data-test-points-count[^>]*>\n([^<>]*)\n<\/div>/imu).flatten.select { |item|
           !item.empty?
         }.first.to_i
       }

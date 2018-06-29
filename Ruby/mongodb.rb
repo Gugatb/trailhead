@@ -112,11 +112,11 @@ class MongoDB
 
       if result != nil
         first = JSON.neat_generate(result.first)
-        time1 = Time.parse(Time.now.to_s)
-        time2 = Time.parse(JSON.parse(first)['time'])
+        time1 = Time.strptime(JSON.parse(first)['time'], "%Y-%m-%d %H:%M:%S")
+        time2 = Time.now
 
         # Verificar se o tempo de vida terminou.
-        if time1 - time2 < time_life
+        if time2 - time1 < time_life
           json = first
         else
           # Se o tempo de vida terminou, apagar o documento.

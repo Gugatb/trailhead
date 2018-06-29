@@ -5,4 +5,5 @@ Get the user information on Trailhead (Salesforce).
 
 Solutions
 -----------------------------------------------------------------------------------------
-1. Ruby  
+1. Python
+2. Ruby
