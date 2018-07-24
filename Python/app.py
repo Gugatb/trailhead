@@ -3,17 +3,17 @@ import re
 import urllib.request
 
 from datetime import datetime
-# from flask import Flask, request
-# from flask_restful import Resource, Api, reqparse
-# from flask import jsonify
+from flask import Flask, request
+from flask_restful import Resource, Api, reqparse
+from flask import jsonify
 from mongodb import *
 
-# app = Flask(__name__)
-# api = Api(app)
+app = Flask(__name__)
+api = Api(app)
 db = MongoDB()
 
 # Tempo de vida da cache (5 minutos).
-time_life = 20 #5 * 60
+time_life = 5 * 60
 
 def get_information(profile_id):
     '''
@@ -40,7 +40,10 @@ def get_information(profile_id):
             html = urllib.request.urlopen('https://trailhead.salesforce.com/pt-BR/me/' + profile_id).read()
             string = str(html)
 
-            if html is not None and len(string) > 0:
+            if len(string) > 0:
+                # Remover o '\\n' antes e depois de 'pontos' e 'trilhas'.
+                string = string.replace('\\n', '')
+
                 # Definir o id.
                 information['profile_id'] = profile_id
 
@@ -50,27 +53,28 @@ def get_information(profile_id):
 
                 # Obter os emblemas.
                 matches = re.search('<div [^>]*data-test-badges-count[^>]*>([^<>]*)<\/div>', string)
-                information['badges'] = int(matches.group(1)) if matches is not None else 0
+                information['badges'] = float(matches.group(1)) if matches is not None else 0
 
                 # Obter os trilhas.
-                matches = re.search('<div [^>]*data-test-trails-count[^>]*>\n([^<>]*)\n<\/div>', string)
-                information['trails'] = int(matches.group(1)) if matches is not None else 0
+                matches = re.search('<div [^>]*data-test-trails-count[^>]*>([^<>]*)<\/div>', string)
+                information['trails'] = float(matches.group(1)) if matches is not None else 0
 
                 # Obter os pontos.
-                matches = re.search('<div [^>]*data-test-points-count[^>]*>\n([^<>]*)\n<\/div>', string)
-                information['points'] = int(matches.group(1)) if matches is not None else 0
+                matches = re.search('<div [^>]*data-test-points-count[^>]*>([^<>]*)<\/div>', string)
+                information['points'] = float(matches.group(1)) if matches is not None else 0
 
                 # Inserir o documento na cache.
                 db.insert('cache', information)
-            else:
-                information = {
-                    'profile_id': json['profile_id'],
-                    'name': json['name'],
-                    'badges': json['badges'],
-                    'trails': json['trails'],
-                    'points': json['points'],
-                    'time': json['time']
-                }
+                del information['_id']
+        else:
+            information = {
+                'profile_id': json['profile_id'],
+                'name': json['name'],
+                'badges': json['badges'],
+                'trails': json['trails'],
+                'points': json['points'],
+                'time': json['time']
+            }
 
     except Exception as message:
         print(str(message))
@@ -93,63 +97,26 @@ def get_informations(profile_ids):
         print(str(message))
     return informations
 
-# class print_hello(Resource):
-#     '''
-#     Exibir o ola mundo.
-#     Author: Gugatb
-#     Date: 15/06/2018
-#     '''
-#     def get(self):
-        # Inserir o documento.
-        # result = db.insert('test', {'Teste': 'key', 'time': str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))})
-        # result = db.insert('test', {'Teste': 'key2'})
-        # result = db.insert('test', {'Teste': 'key2'})
-        # result = db.update('test', 'ABC', 'Teste', 'XYZ')
+@app.route('/information/<profile_id>')
+def print_information(profile_id):
+    '''
+    Imprimir a informacao.
+    Author: Gugatb
+    Date: 23/07/2018
+    Param: information a informacao
+    '''
+    return jsonify(get_information(profile_id))
 
-        # result = db.read('test', 'key')
-        # result = db.readCache('test', 'key', 10)
-
-        # if result is None:
-        #     result = db.insert('test', {'Teste': 'key', 'time': str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))})
-        #     result = db.read('test', 'key')
-
-        # html = urllib.request.urlopen('https://python.org/').read()
-        #
-        # return jsonify(str(html))
-
-        # result = {'data': ['ola', 'mundo']}
-        # return jsonify(result)
-        # return result
-        # return jsonify({'Result': str(db.delete('test', 'key'))})
-
-# class print_params(Resource):
-#     '''
-#     Exibir os parametros.
-#     Author: Gugatb
-#     Date: 15/06/2018
-#     '''
-#     def get(self):
-#         parser = reqparse.RequestParser()
-#         parser.add_argument('key1', type = str)
-#         parser.add_argument('key2', type = str)
-#         return parser.parse_args()
-
-# class print_text(Resource):
-#     '''
-#     Exibir o texto.
-#     Author: Gugatb
-#     Date: 15/06/2018
-#     Param: value o valor
-#     '''
-#     def get(self, value):
-#         result = {'text': value}
-#         return jsonify(result)
-
-# api.add_resource(print_hello, '/hello')
-# api.add_resource(print_params, '/param', endpoint = 'param')
-# api.add_resource(print_text, '/text/<value>')
+@app.route('/informations', methods = ['POST'])
+def print_informations():
+    '''
+    Imprimir a informacao.
+    Author: Gugatb
+    Date: 23/07/2018
+    Param: information a informacao
+    '''
+    json = request.get_json(force=True)
+    return jsonify(get_informations(json))
 
 if __name__ == '__main__':
-	# app.run(debug=True, port='8080')
-    # print(get_information('00550000006x1XgAAI'))
-    print(get_informations(['00550000006x1XgAAI', '00550000006x1XgAAI']))
+	app.run(debug=True, port='8080')

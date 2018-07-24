@@ -25,7 +25,7 @@ class MongoDB:
 
         try:
             # Deletar o documento.
-            result = client_db[collection_name].delete_many({'Teste': id})
+            result = client_db[collection_name].delete_many({'profile_id': id})
             counter = int(result.deleted_count)
         except Exception as message:
             print(str(message))
@@ -63,7 +63,7 @@ class MongoDB:
         Return: counter o contador de documentos inseridos
         """
         try:
-            for document in client_db[collection_name].find({'Teste': id}):
+            for document in client_db[collection_name].find({'profile_id': id}):
                 return str(document)
         except Exception as message:
             print(str(message))
@@ -80,16 +80,16 @@ class MongoDB:
         Return: json o json
         """
         try:
-            for document in client_db[collection_name].find({'Teste': id}):
+            for document in client_db[collection_name].find({'profile_id': id}):
                 time1 = datetime.strptime(document['time'], "%Y-%m-%d %H:%M:%S")
                 time2 = datetime.now()
 
                 # Verificar se o tempo de vida terminou.
                 if (time2 - time1).total_seconds() < time_life:
-                    return str(document)
+                    return document
                 else:
                     # Se o tempo de vida terminou, apagar o documento.
-                    client_db[collection_name].delete_many({'Teste': id})
+                    client_db[collection_name].delete_many({'profile_id': id})
                     break
         except Exception as message:
             print(str(message))
@@ -110,7 +110,7 @@ class MongoDB:
 
         try:
             # Atualizar o documento.
-            result = client_db[collection_name].update_many({'Teste': id}, {'$set': {field: value}})
+            result = client_db[collection_name].update_many({'profile_id': id}, {'$set': {field: value}})
             counter = int(result.modified_count)
         except Exception as message:
             print(str(message))

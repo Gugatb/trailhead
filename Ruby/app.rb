@@ -30,32 +30,36 @@ def get_information(profile_id)
     json = db.readCache('cache', profile_id, $time_life)
 
     if json == nil
-      html = open('https://trailhead.salesforce.com/pt-BR/me/' + profile_id) { |file|
-        # Obter a linha.
-        line = file.read
+      html = open('https://trailhead.salesforce.com/pt-BR/me/' + profile_id) { |line|
+        string = line.read
 
-        # Definir o id.
-        information['profile_id'] = profile_id
+        if string.length > 0
+          # Remover o '\\n' antes e depois de 'pontos' e 'trilhas'.
+          string = string.sub('\n', '')
 
-        # Obter o nome.
-        information['name'] = line.scan(/<h1 [^>]*data-test-user-name[^>]*>([^<>]*)<\/h1>/imu).flatten.select { |item|
-          !item.empty?
-        }.first
+          # Definir o id.
+          information['profile_id'] = profile_id
 
-        # Obter os emblemas.
-        information['badges'] = line.scan(/<div [^>]*data-test-badges-count[^>]*>([^<>]*)<\/div>/imu).flatten.select { |item|
-          !item.empty?
-        }.first.to_i
+          # Obter o nome.
+          information['name'] = string.scan(/<h1 [^>]*data-test-user-name[^>]*>([^<>]*)<\/h1>/imu).flatten.select { |item|
+            !item.empty?
+          }.first
 
-        # Obter os trilhas.
-        information['trails'] = line.scan(/<div [^>]*data-test-trails-count[^>]*>\n([^<>]*)\n<\/div>/imu).flatten.select { |item|
-          !item.empty?
-        }.first.to_i
+          # Obter os emblemas.
+          information['badges'] = string.scan(/<div [^>]*data-test-badges-count[^>]*>([^<>]*)<\/div>/imu).flatten.select { |item|
+            !item.empty?
+          }.first.to_f
 
-        # Obter os pontos.
-        information['points'] = line.scan(/<div [^>]*data-test-points-count[^>]*>\n([^<>]*)\n<\/div>/imu).flatten.select { |item|
-          !item.empty?
-        }.first.to_i
+          # Obter os trilhas.
+          information['trails'] = string.scan(/<div [^>]*data-test-trails-count[^>]*>([^<>]*)<\/div>/imu).flatten.select { |item|
+            !item.empty?
+          }.first.to_f
+
+          # Obter os pontos.
+          information['points'] = string.scan(/<div [^>]*data-test-points-count[^>]*>([^<>]*)<\/div>/imu).flatten.select { |item|
+            !item.empty?
+          }.first.to_f
+        end
       }
 
       # Inserir o documento na cache.
