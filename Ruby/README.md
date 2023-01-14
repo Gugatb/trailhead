@@ -28,10 +28,10 @@ Endpoints to category
 -----------------------------------------------------------------------------------------
 localhost:8080/information/00550000006x1XgAAI
 
-{"name":"Gustavo Tsuda Bellentani","badges":49,"trails":4,"points":33.325}
+{"name":"Jhon Doe","badges":49,"trails":4,"points":33.325}
 
 localhost:8080/informations
 
 Params: ["00550000006x1XgAAI", "00550000006x1XgAAI"]
 
-[{"name":"Gustavo Tsuda Bellentani","badges":49,"trails":4,"points":33.325},{"name":"Gustavo Tsuda Bellentani","badges":49,"trails":4,"points":33.325}]
+[{"name":"Jhon Doe","badges":49,"trails":4,"points":33.325},{"name":"Jhon Doe","badges":49,"trails":4,"points":33.325}]
